@@ -1,39 +1,67 @@
 extern crate sysinfo;
-use cursive::views::{Dialog, TextView};
+use cursive::views::Dialog;
 use cursive::Cursive;
-use cursive::views::StackView;
+use cursive::views::LinearLayout;
 
 use sysinfo::{NetworkExt, ProcessExt, ProcessorExt, System, SystemExt};
-use std::{thread, time};
 
 
-fn get_processes(system : &mut sysinfo::System) -> std::vec::Vec<String> {
+fn get_my_processes(system : &mut sysinfo::System) -> String {
     system.refresh_all();
-    let mut vec_pid = Vec::new();
+    let mut my_vec = Vec::new();
     for (pid, process) in system.get_processes() {
-        vec_pid.push(pid.to_string());
-        vec_pid.push(process.name().to_string());
+        my_vec.push(pid.to_string());
+        my_vec.push(process.name().to_string());
     }
-    return vec_pid;
+    let mut my_s = String::new();
+    for x in (0..my_vec.len()).step_by(2) {
+        my_s.push_str(&my_vec[x].to_string());
+        my_s.push_str(": ");
+        my_s.push_str(&my_vec[x + 1].to_string());
+        my_s.push_str("\n");
+    }
+    return my_s;
+}
+
+
+fn get_my_cpu_usage(system : &mut sysinfo::System) -> String {
+    system.refresh_all();
+    let mut my_vec = Vec::new();
+
+
+    for processor in system.get_processors() {
+        my_vec.push(processor.get_cpu_usage());
+    }
+    let mut my_s = String::new();
+    for x in (0..my_vec.len()).step_by(1) {
+        my_s.push_str(&format!("{:^3}", &my_vec[x]).to_string());
+        my_s.push_str(" [");
+        for i in (0..100).step_by(2) {
+            if i < my_vec[x] as u8 {
+                my_s.push_str("|");
+            }
+            else {
+                my_s.push_str(" ");
+            }
+        }
+        my_s.push_str("]\n");
+    }
+    return my_s;
 }
 
 fn my_loop(s: &mut Cursive) {
     let mut system = sysinfo::System::new_all();
-    let one_sec = time::Duration::from_millis(1000);
-    let mut count = 0u32;
+    s.pop_layer();
     s.pop_layer();
 
-    let vec_pid = get_processes(&mut system);
-    let mut my_s = String::new();
-    for x in (0..vec_pid.len()).step_by(2) {
-        my_s.push_str(&vec_pid[x].to_string());
-        my_s.push_str(": ");
-        my_s.push_str(&vec_pid[x + 1].to_string());
-        my_s.push_str("\n");
-    }
+    let process_string = get_my_processes(&mut system);
+    let cpu_string = get_my_cpu_usage(&mut system);
 
-    s.add_layer(Dialog::text(my_s).title("Running Processes").button("Next", my_loop));
+    let process = Dialog::text(process_string).title("Running Processes");
+    let cpu = Dialog::text(cpu_string).title("CPU Usage");
 
+    let  layout = LinearLayout::horizontal().child(process).child(cpu);
+    s.add_layer(layout);
 }
 
 
@@ -41,10 +69,9 @@ fn main() {
 
     let mut siv = cursive::default();
     siv.add_global_callback('q', |s| s.quit());
+    siv.add_global_callback(' ', |s| my_loop(s));
 
-    siv.add_layer(Dialog::text("Press <Next> when you're ready.")
-        .title("Htop")
-        .button("Next", my_loop));
+    my_loop(&mut siv);
 
     siv.run();
 
