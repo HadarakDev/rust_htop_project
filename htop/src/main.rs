@@ -5,6 +5,7 @@ use cursive::views::LinearLayout;
 
 use sysinfo::{NetworkExt, ProcessExt, ProcessorExt, System, SystemExt};
 
+use std::{thread, time};
 
 fn get_my_processes(system : &mut sysinfo::System) -> String {
     system.refresh_all();
@@ -12,16 +13,22 @@ fn get_my_processes(system : &mut sysinfo::System) -> String {
     for (pid, process) in system.get_processes() {
         my_vec.push(pid.to_string());
         my_vec.push(process.name().to_string());
+        my_vec.push(format!("{:?}", process.cpu_usage()));
+        my_vec.push(format!("{:?}", process.memory()));
         my_vec.push(format!("{:?}", process.status()));
     }
     let mut my_s = String::new();
-    my_s.push_str(&format!("{:^5}: {:^6}: {:^6}\n", "pid", "name", "status"));
-    for x in (0..my_vec.len()).step_by(3) {
+    my_s.push_str(&format!("{:^5}: {:^6}: {:^6}: {:^6}: {:^6}\n", "pid", "name", "cpu(%)", "memory(kb)",  "status"));
+    for x in (0..my_vec.len()).step_by(5) {
         my_s.push_str(&format!("{:^5}", &my_vec[x]).to_string());
         my_s.push_str(": ");
         my_s.push_str(&format!("{:^6}", &my_vec[x + 1]).to_string());
         my_s.push_str(": ");
-        my_s.push_str(&format!("{:^6}", &my_vec[x + 2]).to_string());
+        my_s.push_str(&format!("{:^6}", &my_vec[x + 2])[0..6].to_string());
+        my_s.push_str(": ");
+        my_s.push_str(&format!("{:^10}", &my_vec[x + 3]).to_string());
+        my_s.push_str(": ");
+        my_s.push_str(&format!("{:^6}", &my_vec[x + 4]).to_string());
         my_s.push_str("\n");
     }
     return my_s;
@@ -74,7 +81,11 @@ fn main() {
     let mut siv = cursive::default();
     siv.add_global_callback('q', |s| s.quit());
     siv.add_global_callback(' ', |s| my_loop(s));
-
+    thread::spawn(move || {
+        for i in (0..10000) {
+            thread::sleep(time::Duration::from_millis(100));
+        }
+    });
     my_loop(&mut siv);
 
     siv.run();
