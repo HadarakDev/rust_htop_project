@@ -12,12 +12,16 @@ fn get_my_processes(system : &mut sysinfo::System) -> String {
     for (pid, process) in system.get_processes() {
         my_vec.push(pid.to_string());
         my_vec.push(process.name().to_string());
+        my_vec.push(format!("{:?}", process.status()));
     }
     let mut my_s = String::new();
-    for x in (0..my_vec.len()).step_by(2) {
-        my_s.push_str(&my_vec[x].to_string());
+    my_s.push_str(&format!("{:^5}: {:^6}: {:^6}\n", "pid", "name", "status"));
+    for x in (0..my_vec.len()).step_by(3) {
+        my_s.push_str(&format!("{:^5}", &my_vec[x]).to_string());
         my_s.push_str(": ");
-        my_s.push_str(&my_vec[x + 1].to_string());
+        my_s.push_str(&format!("{:^6}", &my_vec[x + 1]).to_string());
+        my_s.push_str(": ");
+        my_s.push_str(&format!("{:^6}", &my_vec[x + 2]).to_string());
         my_s.push_str("\n");
     }
     return my_s;
@@ -75,12 +79,6 @@ fn main() {
 
     siv.run();
 
-    // siv.add_layer(Dialog::around(TextView::new("Hello Dialog!"))
-    // .title("Cursive")
-    // .button("Quit", |s| s.quit()));
-
-    // // Starts the event loop.
-    // siv.run();
 
 
     // Now let's print every process' id and name:
