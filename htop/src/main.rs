@@ -81,12 +81,12 @@ fn get_my_disks(system : &mut sysinfo::System) -> String {
         my_vec.push(get_disk_type_string(disk.get_type()));
         // my_vec.push(format!("{:?}", disk.get_file_system()));
         my_vec.push(format!("{:?}", disk.get_mount_point()));
-        my_vec.push(format!("{:?}", disk.get_total_space()));
-        my_vec.push(format!("{:?}", disk.get_available_space()));
+        my_vec.push(format!("{:?}", disk.get_total_space() / 1000000000));
+        my_vec.push(format!("{:?}", disk.get_available_space() / 1000000000));
     }
     let mut my_s = String::with_capacity(2048);
 
-    my_s.push_str(&format!("{:^8}: {:^8}: {:^10}: {:^12}: {:^12}\n", "Name", "Type", "Mount", "Total(kb)",  "Free(kb)"));
+    my_s.push_str(&format!("{:^8}: {:^8}: {:^10}: {:^12}: {:^12}\n", "Name", "Type", "Mount", "Total(Gb)",  "Free(Gb)"));
     for x in (0..my_vec.len()).step_by(5) {
         my_s.push_str(&format!("{:^8}", &my_vec[x]));
         my_s.push_str(": ");
