@@ -18,11 +18,12 @@ fn get_my_processes(system : &mut sysinfo::System) -> String {
         my_vec.push(process.name().to_string());
         my_vec.push(format!("{:?}", process.cpu_usage()));
         my_vec.push(format!("{:?}", process.memory()));
-        my_vec.push(format!("{:?}", process.status()));
+        // my_vec.push(format!("{:?}", process.status()));
     }
     let mut my_s = String::with_capacity(2048);
-    my_s.push_str(&format!("{:^5}: {:^6}: {:^6}: {:^6}: {:^6}\n", "pid", "name", "cpu(%)", "memory(kb)",  "status"));
-    for x in (0..my_vec.len()).step_by(5) {
+    // my_s.push_str(&format!("{:^5}: {:^6}: {:^6}: {:^6}: {:^6}\n", "Pid", "Name", "Cpu(%)", "Memory(kb)",  "Status"));
+    my_s.push_str(&format!("{:^5}: {:^6}: {:^6}: {:^6}\n", "Pid", "Name", "Cpu(%)", "Memory(kb)"));
+    for x in (0..my_vec.len()).step_by(4) {
         my_s.push_str(&format!("{:^5}", &my_vec[x]));
         my_s.push_str(": ");
         my_s.push_str(&format!("{:^6}", &my_vec[x + 1]));
@@ -30,8 +31,8 @@ fn get_my_processes(system : &mut sysinfo::System) -> String {
         my_s.push_str(&format!("{:^6}", &my_vec[x + 2])[0..6]);
         my_s.push_str(": ");
         my_s.push_str(&format!("{:^10}", &my_vec[x + 3]));
-        my_s.push_str(": ");
-        my_s.push_str(&format!("{:^6}", &my_vec[x + 4]));
+        // my_s.push_str(": ");
+        // my_s.push_str(&format!("{:^6}", &my_vec[x + 4]));
         my_s.push_str("\n");
     }
     return my_s;
@@ -75,19 +76,29 @@ fn get_disk_type_string(disk : sysinfo::DiskType) -> String {
 fn get_my_disks(system : &mut sysinfo::System) -> String {
     system.refresh_all();
     let mut my_vec = Vec::new();
-    println!("MY disks");
     for disk in system.get_disks() {
         my_vec.push(disk.get_name().to_string_lossy().into_owned());
         my_vec.push(get_disk_type_string(disk.get_type()));
-        // my_vec.push(disk.get_file_system());
-        // my_vec.push(disk.get_mount_point());
-        // my_vec.push(disk.get_total_space());
-        // my_vec.push(disk.get_available_space());
+        // my_vec.push(format!("{:?}", disk.get_file_system()));
+        my_vec.push(format!("{:?}", disk.get_mount_point()));
+        my_vec.push(format!("{:?}", disk.get_total_space()));
+        my_vec.push(format!("{:?}", disk.get_available_space()));
     }
     let mut my_s = String::with_capacity(2048);
 
-    for x in (0..my_vec.len()).step_by(2) {
-        my_s.push_str(&format!("{}", &my_vec[x]));
+    my_s.push_str(&format!("{:^8}: {:^8}: {:^10}: {:^12}: {:^12}\n", "Name", "Type", "Mount", "Total(kb)",  "Free(kb)"));
+    for x in (0..my_vec.len()).step_by(5) {
+        my_s.push_str(&format!("{:^8}", &my_vec[x]));
+        my_s.push_str(": ");
+        my_s.push_str(&format!("{:^8}", &my_vec[x + 1]));
+        my_s.push_str(": ");
+        my_s.push_str(&format!("{:^10}", &my_vec[x + 2]));
+        my_s.push_str(": ");
+        my_s.push_str(&format!("{:^12}", &my_vec[x + 3]));
+        my_s.push_str(": ");
+        my_s.push_str(&format!("{:^12}", &my_vec[x + 4]));
+        // my_s.push_str(": ");
+        // my_s.push_str(&format!("{}", &my_vec[x + 5]));
         my_s.push_str("\n");
     }
     return my_s;
@@ -96,15 +107,16 @@ fn get_my_disks(system : &mut sysinfo::System) -> String {
 fn my_loop(s: &mut Cursive) {
     let mut system = sysinfo::System::new_all();
     s.pop_layer();
-    s.pop_layer();
 
     let process_string = get_my_processes(&mut system);
     let cpu_string = get_my_cpu_usage(&mut system);
+    let disk_string = get_my_disks(&mut system);
 
     let process = Dialog::text(process_string).title("Running Processes");
     let cpu = Dialog::text(cpu_string).title("CPU Usage");
+    let disks = Dialog::text(disk_string).title("Disks Info");
 
-    let  layout = LinearLayout::horizontal().child(process).child(cpu);
+    let  layout = LinearLayout::horizontal().child(process).child(cpu).child(disks);
     s.add_layer(layout);
 }
 
@@ -120,7 +132,7 @@ fn main() {
         my_loop(&mut siv);
         siv.step();
         siv.refresh();
-        thread::sleep(time::Duration::from_millis(500));
+        thread::sleep(time::Duration::from_millis(1000));
     }
     
 
