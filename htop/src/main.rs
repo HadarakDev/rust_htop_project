@@ -1,7 +1,5 @@
 extern crate sysinfo;
 
-use std::fmt;
-
 use cursive::views::Dialog;
 use cursive::Cursive;
 use cursive::views::LinearLayout;
@@ -116,7 +114,7 @@ fn my_loop(s: &mut Cursive) {
     let cpu = Dialog::text(cpu_string).title("CPU Usage");
     let disks = Dialog::text(disk_string).title("Disks Info");
 
-    let  layout = LinearLayout::horizontal().child(process).child(cpu).child(disks);
+    let  layout = LinearLayout::vertical().child(cpu).child(LinearLayout::horizontal().child(process).child(disks));
     s.add_layer(layout);
 }
 

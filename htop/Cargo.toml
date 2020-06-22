@@ -9,4 +9,3 @@ edition = "2018"
 [dependencies]
 sysinfo = "0.13.0"
 cursive = "0.14"
-cursive-async-view = "0.3.3"
