@@ -2,9 +2,9 @@
 # It is not intended for manual editing.
 [[package]]
 name = "ahash"
-version = "0.3.5"
+version = "0.2.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f3e0bf23f51883cce372d5d5892211236856e4bb37fb942e1eb135ee0f146e3"
+checksum = "6f33b5018f120946c1dcf279194f238a9f146725593ead1c08fa47ff22b0b5d3"
 dependencies = [
  "const-random",
 ]
@@ -129,33 +129,12 @@ dependencies = [
 
 [[package]]
 name = "cursive"
-version = "0.15.0"
+version = "0.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7a9f12332ab2bca26979ef00cfef9a1c2e287db03b787a83d892ad9961f81374"
+checksum = "d62b2fdb98a428e33442612fba04fc7f5a5b67989f0cd3abcfd754dbbec88a85"
 dependencies = [
  "ahash",
  "cfg-if",
- "crossbeam-channel",
- "cursive_core",
- "enumset",
- "lazy_static",
- "libc",
- "log",
- "maplit",
- "ncurses",
- "signal-hook",
- "term_size",
- "unicode-segmentation",
- "unicode-width",
-]
-
-[[package]]
-name = "cursive_core"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fe232694c965c211d5fbd8111ae89a5939b7b169cefcac4f8b6f83dde889e10"
-dependencies = [
- "ahash",
  "chrono",
  "crossbeam-channel",
  "enum-map",
@@ -163,9 +142,12 @@ dependencies = [
  "lazy_static",
  "libc",
  "log",
+ "maplit",
+ "ncurses",
  "num",
  "owning_ref",
  "signal-hook",
+ "term_size",
  "unicode-segmentation",
  "unicode-width",
  "xi-unicode",
@@ -241,9 +223,9 @@ dependencies = [
 
 [[package]]
 name = "enumset"
-version = "1.0.0"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3691ce759534316ad900d57dd8e688e2c4263f9750c0f7c1e9b9a4516d4ca241"
+checksum = "93182dcb6530c757e5879b22ebc5cfbd034861585b442819389614e223ac1c47"
 dependencies = [
  "enumset_derive",
  "num-traits",
@@ -251,9 +233,9 @@ dependencies = [
 
 [[package]]
 name = "enumset_derive"
-version = "0.5.0"
+version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "74bef436ac71820c5cf768d7af9ba33121246b09a00e09a55d94ef8095a875ac"
+checksum = "751a786cfcc7d5ceb9e0fe06f0e911da6ce3a3044633e029df4c370193c86a62"
 dependencies = [
  "darling",
  "proc-macro2",
