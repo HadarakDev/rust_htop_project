@@ -1,14 +1,14 @@
 extern crate sysinfo;
 
 use cursive::views::Dialog;
-use cursive::Cursive;
 use cursive::views::LinearLayout;
+use cursive::Cursive;
 
-use sysinfo::{ProcessExt, ProcessorExt, SystemExt, DiskExt};
+use sysinfo::{DiskExt, ProcessExt, ProcessorExt, SystemExt};
 
 use std::{thread, time};
 
-fn get_my_processes(system : &mut sysinfo::System) -> String {
+fn get_my_processes(system: &mut sysinfo::System) -> String {
     system.refresh_all();
     let mut my_vec = Vec::new();
     for (pid, process) in system.get_processes() {
@@ -18,7 +18,10 @@ fn get_my_processes(system : &mut sysinfo::System) -> String {
         my_vec.push(format!("{:?}", process.memory()));
     }
     let mut my_s = String::with_capacity(2048);
-    my_s.push_str(&format!("{:^5}: {:^6}: {:^6}: {:^6}\n", "Pid", "Name", "Cpu(%)", "Memory(kb)"));
+    my_s.push_str(&format!(
+        "{:^5}: {:^6}: {:^6}: {:^6}\n",
+        "Pid", "Name", "Cpu(%)", "Memory(kb)"
+    ));
     for x in (0..my_vec.len()).step_by(4) {
         my_s.push_str(&format!("{:^5}", &my_vec[x]));
         my_s.push_str(": ");
@@ -32,11 +35,9 @@ fn get_my_processes(system : &mut sysinfo::System) -> String {
     return my_s;
 }
 
-
-fn get_my_cpu_usage(system : &mut sysinfo::System) -> String {
+fn get_my_cpu_usage(system: &mut sysinfo::System) -> String {
     system.refresh_all();
     let mut my_vec = Vec::new();
-
 
     for processor in system.get_processors() {
         my_vec.push(processor.get_cpu_usage());
@@ -48,8 +49,7 @@ fn get_my_cpu_usage(system : &mut sysinfo::System) -> String {
         for i in (0..100).step_by(2) {
             if i < my_vec[x] as u8 {
                 my_s.push_str("|");
-            }
-            else {
+            } else {
                 my_s.push_str(" ");
             }
         }
@@ -60,7 +60,7 @@ fn get_my_cpu_usage(system : &mut sysinfo::System) -> String {
     return my_s;
 }
 
-fn get_disk_type_string(disk : sysinfo::DiskType) -> String {
+fn get_disk_type_string(disk: sysinfo::DiskType) -> String {
     match disk {
         sysinfo::DiskType::HDD => String::from("HDD"),
         sysinfo::DiskType::SSD => String::from("SSD"),
@@ -68,8 +68,7 @@ fn get_disk_type_string(disk : sysinfo::DiskType) -> String {
     }
 }
 
-
-fn get_my_disks(system : &mut sysinfo::System) -> String {
+fn get_my_disks(system: &mut sysinfo::System) -> String {
     system.refresh_all();
     let mut my_vec = Vec::new();
     for disk in system.get_disks() {
@@ -81,7 +80,10 @@ fn get_my_disks(system : &mut sysinfo::System) -> String {
     }
     let mut my_s = String::with_capacity(2048);
 
-    my_s.push_str(&format!("{:^8}: {:^8}: {:^10}: {:^12}: {:^12}\n", "Name", "Type", "Mount", "Total(Gb)",  "Free(Gb)"));
+    my_s.push_str(&format!(
+        "{:^8}: {:^8}: {:^10}: {:^12}: {:^12}\n",
+        "Name", "Type", "Mount", "Total(Gb)", "Free(Gb)"
+    ));
     for x in (0..my_vec.len()).step_by(5) {
         my_s.push_str(&format!("{:^8}", &my_vec[x]));
         my_s.push_str(": ");
@@ -97,25 +99,27 @@ fn get_my_disks(system : &mut sysinfo::System) -> String {
     return my_s;
 }
 
+// println!("MEMORY");
+// println!("total memory: {} KiB", system.get_total_memory());
+// println!("used memory : {} KiB", system.get_used_memory());
+// println!("total swap  : {} KiB", system.get_total_swap());
+// println!("used swap   : {} KiB", system.get_used_swap());
 
-    // println!("MEMORY");
-    // println!("total memory: {} KiB", system.get_total_memory());
-    // println!("used memory : {} KiB", system.get_used_memory());
-    // println!("total swap  : {} KiB", system.get_total_swap());
-    // println!("used swap   : {} KiB", system.get_used_swap());
-
-fn get_my_memory(system : &mut sysinfo::System) -> String {
+fn get_my_memory(system: &mut sysinfo::System) -> String {
     system.refresh_all();
     let mut my_vec = Vec::new();
 
     my_vec.push(format!("{}", system.get_total_memory() / 1049000));
-    my_vec.push(format!("{}", system.get_used_memory()/ 1049000));
-    my_vec.push(format!("{}", system.get_total_swap()/ 1049000));
-    my_vec.push(format!("{}", system.get_used_swap()/ 1049000));
+    my_vec.push(format!("{}", system.get_used_memory() / 1049000));
+    my_vec.push(format!("{}", system.get_total_swap() / 1049000));
+    my_vec.push(format!("{}", system.get_used_swap() / 1049000));
 
     let mut my_s = String::with_capacity(2048);
 
-    my_s.push_str(&format!("{:^5}: {:^5}: {:^5}: {:^5}\n", "Total", "Used", "Swap", "Used"));
+    my_s.push_str(&format!(
+        "{:^5}: {:^5}: {:^5}: {:^5}\n",
+        "Total", "Used", "Swap", "Used"
+    ));
     my_s.push_str(&format!("{}(GiB)", &my_vec[0]));
     my_s.push_str(": ");
     my_s.push_str(&format!("{}(GiB)", &my_vec[1]));
@@ -126,7 +130,6 @@ fn get_my_memory(system : &mut sysinfo::System) -> String {
     my_s.push_str("\n");
     return my_s;
 }
-
 
 fn my_loop(s: &mut Cursive) {
     let mut system = sysinfo::System::new_all();
@@ -141,23 +144,18 @@ fn my_loop(s: &mut Cursive) {
     let cpu = Dialog::text(cpu_string).title("CPU Usage");
     let disks = Dialog::text(disk_string).title("Disks Info");
     let memory = Dialog::text(memory_string).title("Memory Info");
-    
+
     let layout = LinearLayout::vertical()
         // .child(LinearLayout::horizontal()
-                .child(cpu)
-                .child(memory)
-        .child(LinearLayout::horizontal()
-            .child(process)
-            .child(disks));
+        .child(cpu)
+        .child(memory)
+        .child(LinearLayout::horizontal().child(process).child(disks));
     s.add_layer(layout);
 }
 
-
 fn main() {
-
     let mut siv = cursive::default();
     siv.add_global_callback('q', |s| s.quit());
-
 
     while siv.is_running() {
         my_loop(&mut siv);
@@ -170,5 +168,4 @@ fn main() {
     // for (interface_name, data) in system.get_networks() {
     //     println!("{}: {}/{} B", interface_name, data.get_received(), data.get_transmitted());
     // }
-
 }
